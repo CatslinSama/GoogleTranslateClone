@@ -4,45 +4,120 @@ import { NavigationContainer } from '@react-navigation/native';
 import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
-import SeetingScreen from './screens/SeetingScreen';
-import SaveScreen from './screens/SaveScreen';
+import SettingsScreen from './screens/SeetingScreen';
+import SavedScreen from './screens/SaveScreen';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback, useEffect, useState } from 'react';
+import * as Font from 'expo-font'
+import colors from './utils/colors';
+
+SplashScreen.preventAutoHideAsync();
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 const TabNavigator = () => {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name='Home' component={HomeScreen} options={{
-        tabBarLabel: 'Home',
-        tabBarIcon: ({ color }) => (
-          <MaterialCommunityIcons name="home" color={color} size={26} />
-        ),
-      }} />
+    <Tab.Navigator
+      activeColor="#e91e63"
+      barStyle={{ backgroundColor: 'white' }}
+      screenOptions={{ headerShown: false }}>
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          tabBarLabel: "Home",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="home" color={color} size={26} />
+          ),
+        }}
+      />
 
-      <Tab.Screen name='Saved' component={SaveScreen} options={{
-        tabBarLabel: 'Save',
-        tabBarIcon: ({ color }) => (
-          <MaterialCommunityIcons name="bell" color={color} size={26} />
-        ),
-      }} />
+      <Tab.Screen
+        name="Saved"
+        component={SavedScreen}
+        options={{
+          tabBarLabel: "Saved",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="bell" color={color} size={26} />
+          ),
+        }}
+      />
 
-      <Tab.Screen name='Seeting' component={SeetingScreen} options={{
-        tabBarLabel: 'Seeting',
-        tabBarIcon: ({ color }) => (
-          <MaterialCommunityIcons name="account" color={color} size={26} />
-        ),
-      }} />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: "Settings",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="account" color={color} size={26} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   )
 }
 
+
 export default function App() {
+
+  const [appIsLoaded, setAppIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const prepare = async () => {
+      try {
+        await Font.loadAsync({
+          black: require("./assets/fonts//Roboto-Black.ttf"),
+          blackItalic: require("./assets/fonts/Roboto-BlackItalic.ttf"),
+          bold: require("./assets/fonts/Roboto-Bold.ttf"),
+          boldItalic: require("./assets/fonts/Roboto-BoldItalic.ttf"),
+          italic: require("./assets/fonts/Roboto-Italic.ttf"),
+          light: require("./assets/fonts/Roboto-Light.ttf"),
+          lightItalic: require("./assets/fonts/Roboto-LightItalic.ttf"),
+          medium: require("./assets/fonts/Roboto-Medium.ttf"),
+          mediumItalic: require("./assets/fonts/Roboto-MediumItalic.ttf"),
+          regular: require("./assets/fonts/Roboto-Regular.ttf"),
+          thin: require("./assets/fonts/Roboto-Thin.ttf"),
+          thinItalic: require("./assets/fonts/Roboto-ThinItalic.ttf"),
+        });
+      }
+      catch (e) {
+        console.log(e);
+      }
+      finally {
+        setAppIsLoaded(true);
+      }
+    };
+
+    prepare();
+
+  }, []);
+
+  const onLayout = useCallback(async () => {
+    if (appIsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsLoaded]);
+
+  if (!appIsLoaded) {
+    return null;
+  }
+
   return (
     <NavigationContainer>
-      <View style={{ flex: 1 }}>
-        <Stack.Navigator>
+      <View onLayout={onLayout} style={{ flex: 1 }}>
+        <Stack.Navigator
+          screenOptions={{
+            headerTitleStyle: {
+              fontFamily: 'medium',
+              color: 'white'
+            },
+            headerStyle: {
+              backgroundColor: colors.primary
+            }
+          }}
+        >
           <Stack.Screen
             name="main"
             component={TabNavigator}
