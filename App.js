@@ -6,18 +6,17 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
 import SettingsScreen from './screens/SeetingScreen';
 import SavedScreen from './screens/SaveScreen';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
 import * as Font from 'expo-font'
 import colors from './utils/colors';
+import LanguageSelectScreen from './screens/LanguageSelectScreen';
 
 SplashScreen.preventAutoHideAsync();
 
 const Stack = createStackNavigator();
-// const Tab = createMaterialBottomTabNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -121,14 +120,44 @@ export default function App() {
             }
           }}
         >
-          <Stack.Screen
-            name="main"
-            component={TabNavigator}
-            options={{
-              headerTitle: 'Translate',
-              headerTitleAlign: 'center',
+          <Stack.Group>
+            <Stack.Screen
+              name="main"
+              component={TabNavigator}
+              options={{
+                headerTitle: 'Translate',
+                headerTitleAlign: 'center',
+              }}
+            />
+          </Stack.Group>
+
+
+          <Stack.Group
+            screenOptions={{
+              presentation: 'containeeModal',
+              headerStyle: {
+                backgroundColor: 'white'
+              },
+              headerTitleStyle: {
+                color: colors.textColor,
+                fontFamily: 'medium',
+              },
             }}
-          />
+          >
+            <Stack.Screen
+              name="languageSelect"
+              component={LanguageSelectScreen}
+              options={{
+                headerTitle: "Language Select",
+                headerLeft: null, // 隐藏返回按钮
+                headerCenter: () => (
+                  <View>
+                    <Text style={{ fontFamily: 'medium', color: 'white', fontSize: 18 }}>Language Select</Text>
+                  </View>
+                ),
+              }}
+            />
+          </Stack.Group>
         </Stack.Navigator>
       </View>
       <StatusBar style="auto" />
