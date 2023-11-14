@@ -7,6 +7,7 @@ import HomeScreen from './screens/HomeScreen';
 import SettingsScreen from './screens/SeetingScreen';
 import SavedScreen from './screens/SaveScreen';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
@@ -16,7 +17,9 @@ import colors from './utils/colors';
 SplashScreen.preventAutoHideAsync();
 
 const Stack = createStackNavigator();
-const Tab = createMaterialBottomTabNavigator();
+// const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
+
 const TabNavigator = () => {
   return (
     <Tab.Navigator
@@ -40,7 +43,7 @@ const TabNavigator = () => {
         options={{
           tabBarLabel: "Saved",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="bell" color={color} size={26} />
+            <MaterialCommunityIcons name="apple-icloud" color={color} size={26} />
           ),
         }}
       />
@@ -111,7 +114,7 @@ export default function App() {
           screenOptions={{
             headerTitleStyle: {
               fontFamily: 'medium',
-              color: 'white'
+              color: '#FCFAF2'
             },
             headerStyle: {
               backgroundColor: colors.primary
@@ -122,7 +125,7 @@ export default function App() {
             name="main"
             component={TabNavigator}
             options={{
-              headerTitle: 'Cat Translate😼',
+              headerTitle: 'Translate',
               headerTitleAlign: 'center',
             }}
           />
