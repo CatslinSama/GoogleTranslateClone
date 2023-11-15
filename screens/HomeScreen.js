@@ -2,20 +2,69 @@ import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import colors from '../utils/colors';
 import { TextInput } from 'react-native-gesture-handler';
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import supportedLanguages from '../utils/supportedLanguages';
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
 
 export default function HomeScreen(props) {
+  const params = props.route.params || {};
   const [enteredText, setEnteredText] = useState("");
   const [resultText, setResultText] = useState("");
+  const [languageTo, setLanguageTo] = useState("en");
+  const [languageFrom, setLanguageFrom] = useState("zh");
+
+  useEffect(() => {
+    if (params.languageTo) {
+      setLanguageTo(params.languageTo);
+    }
+
+    if (params.languageFrom) {
+      setLanguageFrom(params.languageFrom);
+    }
+  }, [params.languageTo, params.languageFrom]);
+
+
+  const appid = '20231115001880875';  // 你的开发者APP ID
+  const key = 'TN25zqTkIPKyVTMi1MCZ'; // 你的开发者密钥
+
+  const onSubmit = useEffect(() => {
+    const salt = Date.now().toString();
+    const sign = CryptoJS.MD5(appid + enteredText + salt + key).toString();
+  
+    axios({
+      method: 'post',
+      url: 'https://fanyi-api.baidu.com/api/trans/vip/translate',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      params: {
+        q: enteredText,
+        from: languageFrom,
+        to: languageTo,
+        appid,
+        salt,
+        sign
+      }
+    })
+    .then(response => {
+      console.log(response.data.trans_result[0].dst); // 打印翻译结果
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  },[enteredText,languageTo,languageFrom])
+
+
 
   return (
     <View style={styles.container}>
       <View style={styles.languageContainer}>
         <TouchableOpacity
           style={styles.languageOption}
-          onPress={() => props.navigation.navigate("languageSelect",{title: 'Teanslate from'})}
+          onPress={() => props.navigation.navigate("languageSelect", { title: 'Teanslate from', selected: languageFrom, mode: 'from' })}
         >
-          <Text style={styles.languageOptionText}>English to</Text>
+          <Text style={styles.languageOptionText}>{supportedLanguages[languageFrom]}</Text>
         </TouchableOpacity>
 
         <View
@@ -24,9 +73,9 @@ export default function HomeScreen(props) {
 
         <TouchableOpacity
           style={styles.languageOption}
-          onPress={() => props.navigation.navigate("languageSelect")}
+          onPress={() => props.navigation.navigate("languageSelect", { title: 'Teanslate To', selected: languageTo, mode: 'to' })}
         >
-          <Text style={styles.languageOptionText}>French</Text>
+          <Text style={styles.languageOptionText}>{supportedLanguages[languageTo]}</Text>
         </TouchableOpacity>
       </View>
 
@@ -40,10 +89,11 @@ export default function HomeScreen(props) {
         />
 
         <TouchableOpacity
+          onPress={onSubmit}
           disabled={enteredText === ''}
           style={styles.iconContainer}
         >
-          <MaterialCommunityIcons name="ab-testing" size={24} color={enteredText !=='' ? colors.primary : 'gray'} />
+          <MaterialCommunityIcons name="ab-testing" size={24} color={enteredText !== '' ? colors.primary : 'gray'} />
         </TouchableOpacity>
       </View>
 
@@ -54,7 +104,7 @@ export default function HomeScreen(props) {
           disabled={resultText === ''}
           style={styles.iconContainer}
         >
-          <MaterialCommunityIcons name="content-copy" size={24} color={resultText !=='' ? colors.copyColor : colors.textColorcopyColor} />
+          <MaterialCommunityIcons name="content-copy" size={24} color={resultText !== '' ? colors.copyColor : colors.textColorcopyColor} />
         </TouchableOpacity>
       </View>
 
