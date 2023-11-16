@@ -1,55 +1,23 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { Entypo } from '@expo/vector-icons';
 import colors from "../utils/colors";
-import { useDispatch, useSelector } from "react-redux";
-import { useCallback } from "react";
-import { setSavedItems } from "../store/savedItemsSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Feather } from '@expo/vector-icons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default TranslationResult = props => {
-    const dispatch = useDispatch();
-
-    const { itemId } = props;
-    const item = useSelector(state => {
-        return state.history.items.find(item => item.id === itemId) ||
-            state.savedItems.items.find(item => item.id === itemId)
-    });
-    const savedItems = useSelector(state => state.savedItems.items);
-
-    const isSaved = savedItems.some(i => i.id === itemId);
-    const starIcon = isSaved ? "star" : "star-outlined";
-
-    const starItem = useCallback(async () => {
-        let newSavedItems;
-
-        if (isSaved) {
-            newSavedItems = savedItems.filter(i => i.id !== itemId);
-        }
-        else {
-            newSavedItems = savedItems.slice();
-            newSavedItems.push(item);
-        }
-
-        await AsyncStorage.setItem('savedItems', JSON.stringify(newSavedItems));
-
-        dispatch(setSavedItems({ items: newSavedItems }));
-    }, [dispatch, savedItems]);
-
-    return <View style={styles.container}>
-
+    return <View
+        style={styles.container}
+        onPress={props.onPress}>
         <View style={styles.textContainer}>
-            <Text
-                numberOfLines={4}
-                style={styles.title}>{item.original_text}</Text>
-            <Text
-                numberOfLines={4}
-                style={styles.subTitle}>{item.translated_text[item.to]}</Text>
+            <Text 
+            numberOfLines={4}
+            style={styles.title}>Some item</Text>
+            <Text 
+            numberOfLines={4}
+            style={styles.subTitle}>Some sub title</Text>
         </View>
 
-        <TouchableOpacity
-            onPress={starItem}
-            style={styles.iconContainer}>
-            <Entypo name={starIcon} size={24} color={colors.subTextColor} />
+        <TouchableOpacity>
+          <MaterialCommunityIcons name="star" size={24} color={colors.subTextColor} />
         </TouchableOpacity>
     </View>
 }

@@ -13,6 +13,8 @@ import { useCallback, useEffect, useState } from 'react';
 import * as Font from 'expo-font'
 import colors from './utils/colors';
 import LanguageSelectScreen from './screens/LanguageSelectScreen';
+import { Provider } from 'react-redux';
+import store from './store/store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -107,60 +109,62 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <View onLayout={onLayout} style={{ flex: 1 }}>
-        <Stack.Navigator
-          screenOptions={{
-            headerTitleStyle: {
-              fontFamily: 'medium',
-              color: '#FCFAF2'
-            },
-            headerStyle: {
-              backgroundColor: colors.primary
-            }
-          }}
-        >
-          <Stack.Group>
-            <Stack.Screen
-              name="main"
-              component={TabNavigator}
-              options={{
-                headerTitle: 'Translate',
-                headerTitleAlign: 'center',
-              }}
-            />
-          </Stack.Group>
-
-
-          <Stack.Group
+    <Provider store={store}>
+      <NavigationContainer>
+        <View onLayout={onLayout} style={{ flex: 1 }}>
+          <Stack.Navigator
             screenOptions={{
-              presentation: 'containeeModal',
-              headerStyle: {
-                backgroundColor: 'white'
-              },
               headerTitleStyle: {
-                color: colors.textColor,
                 fontFamily: 'medium',
+                color: '#FCFAF2'
               },
+              headerStyle: {
+                backgroundColor: colors.primary
+              }
             }}
           >
-            <Stack.Screen
-              name="languageSelect"
-              component={LanguageSelectScreen}
-              options={{
-                headerTitle: "Language Select",
-                headerLeft: null, // 隐藏返回按钮
-                headerCenter: () => (
-                  <View>
-                    <Text style={{ fontFamily: 'medium', color: 'white', fontSize: 18 }}>Language Select</Text>
-                  </View>
-                ),
+            <Stack.Group>
+              <Stack.Screen
+                name="main"
+                component={TabNavigator}
+                options={{
+                  headerTitle: 'Translate',
+                  headerTitleAlign: 'center',
+                }}
+              />
+            </Stack.Group>
+
+
+            <Stack.Group
+              screenOptions={{
+                presentation: 'containeeModal',
+                headerStyle: {
+                  backgroundColor: 'white'
+                },
+                headerTitleStyle: {
+                  color: colors.textColor,
+                  fontFamily: 'medium',
+                },
               }}
-            />
-          </Stack.Group>
-        </Stack.Navigator>
-      </View>
-      <StatusBar style="auto" />
-    </NavigationContainer>
+            >
+              <Stack.Screen
+                name="languageSelect"
+                component={LanguageSelectScreen}
+                options={{
+                  headerTitle: "Language Select",
+                  headerLeft: null, // 隐藏返回按钮
+                  headerCenter: () => (
+                    <View>
+                      <Text style={{ fontFamily: 'medium', color: 'white', fontSize: 18 }}>Language Select</Text>
+                    </View>
+                  ),
+                }}
+              />
+            </Stack.Group>
+          </Stack.Navigator>
+        </View>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </Provider>
   );
 }

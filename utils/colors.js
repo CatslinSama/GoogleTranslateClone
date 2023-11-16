@@ -4,5 +4,6 @@ export default {
     lightGrey: '#dedede',
     textColor: '#202124',
     copyColor: '#A5DEE4',
-    greyBackground: '#F2F2F7'
+    greyBackground: '#F2F2F7',
+    subTextColor: '#5f6368'
 }

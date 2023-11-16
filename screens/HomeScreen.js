@@ -1,10 +1,14 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import colors from '../utils/colors';
-import { TextInput } from 'react-native-gesture-handler';
+import { FlatList, TextInput } from 'react-native-gesture-handler';
 import { useEffect, useState, useCallback } from 'react';
 import supportedLanguages from '../utils/supportedLanguages';
 import translate from '../utils/translate';
+import * as Clipboard from 'expo-clipboard';
+import { useDispatch, useSelector } from 'react-redux';
+import { addHistoryItem, setHistoryItems } from '../store/historySlice';
+import TranslationResult from '../components/TranslationResult';
 
 
 export default function HomeScreen(props) {
@@ -14,6 +18,9 @@ export default function HomeScreen(props) {
   const [languageTo, setLanguageTo] = useState("en");
   const [languageFrom, setLanguageFrom] = useState("zh");
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const history = useSelector(state =>  state.history.items);
 
 
 
@@ -39,15 +46,17 @@ export default function HomeScreen(props) {
         return;
       }
       setResultText(result);
+
+      // dispatch
+      dispatch(addHistoryItem({ item: result }));
     } catch (error) {
-      console.log("bug :: ", error);
+      console.log("bug in onSubmit :", error);
     }
     finally {
       setIsLoading(false);
     }
 
-  }, [enteredText, languageTo, languageFrom]);
-
+  }, [enteredText, languageTo, languageFrom,dispatch]);
 
 
   const copyToClipboard = useCallback(async () => {
@@ -90,10 +99,15 @@ export default function HomeScreen(props) {
 
         <TouchableOpacity
           onPress={isLoading ? undefined : onSubmit}
-          disabled={enteredText === ''}
-          style={styles.iconContainer}
-        >
-          <MaterialCommunityIcons name="ab-testing" size={24} color={enteredText !== '' ? colors.primary : 'gray'} />
+          disabled={enteredText === ""}
+          style={styles.iconContainer}>
+
+          {
+            isLoading ?
+              <ActivityIndicator size={'small'} color={colors.primary} /> :
+              <MaterialCommunityIcons name="translate" size={24} color={resultText !== '' ? 'black' : 'gray'} />
+          }
+
         </TouchableOpacity>
       </View>
 
@@ -112,7 +126,12 @@ export default function HomeScreen(props) {
       <View
         style={styles.historyContainer}
       >
-
+        <FlatList 
+          data={history}
+          renderItem={itemData => {
+            return <TranslationResult/>
+          }}
+        />
       </View>
     </View >
   );
