@@ -4,8 +4,8 @@ import colors from '../utils/colors';
 import { TextInput } from 'react-native-gesture-handler';
 import { useEffect, useState, useCallback } from 'react';
 import supportedLanguages from '../utils/supportedLanguages';
-import axios from 'axios';
-import CryptoJS from 'crypto-js';
+import translate from '../utils/translate';
+
 
 export default function HomeScreen(props) {
   const params = props.route.params || {};
@@ -13,6 +13,9 @@ export default function HomeScreen(props) {
   const [resultText, setResultText] = useState("");
   const [languageTo, setLanguageTo] = useState("en");
   const [languageFrom, setLanguageFrom] = useState("zh");
+  const [isLoading, setIsLoading] = useState(false);
+
+
 
   useEffect(() => {
     if (params.languageTo) {
@@ -25,35 +28,32 @@ export default function HomeScreen(props) {
   }, [params.languageTo, params.languageFrom]);
 
 
-  const appid = '20231115001880875';  // 你的开发者APP ID
-  const key = 'TN25zqTkIPKyVTMi1MCZ'; // 你的开发者密钥
 
-  const onSubmit = useEffect(() => {
-    const salt = Date.now().toString();
-    const sign = CryptoJS.MD5(appid + enteredText + salt + key).toString();
-  
-    axios({
-      method: 'post',
-      url: 'https://fanyi-api.baidu.com/api/trans/vip/translate',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      params: {
-        q: enteredText,
-        from: languageFrom,
-        to: languageTo,
-        appid,
-        salt,
-        sign
+  const onSubmit = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const result = await translate(enteredText, languageFrom, languageTo);
+      console.log("Translation result: ", result);
+      if (!result) {
+        setResultText("");
+        return;
       }
-    })
-    .then(response => {
-      console.log(response.data.trans_result[0].dst); // 打印翻译结果
-    })
-    .catch(error => {
-      console.log(error);
-    });
-  },[enteredText,languageTo,languageFrom])
+      setResultText(result);
+    } catch (error) {
+      console.log("bug :: ", error);
+    }
+    finally {
+      setIsLoading(false);
+    }
+
+  }, [enteredText, languageTo, languageFrom]);
+
+
+
+  const copyToClipboard = useCallback(async () => {
+    await Clipboard.setStringAsync(resultText);
+  }, [resultText]);
+
 
 
 
@@ -89,7 +89,7 @@ export default function HomeScreen(props) {
         />
 
         <TouchableOpacity
-          onPress={onSubmit}
+          onPress={isLoading ? undefined : onSubmit}
           disabled={enteredText === ''}
           style={styles.iconContainer}
         >
@@ -100,11 +100,12 @@ export default function HomeScreen(props) {
 
       <View style={styles.resultContainer}>
         <Text style={styles.resultText}>{resultText}</Text>
+
         <TouchableOpacity
-          disabled={resultText === ''}
-          style={styles.iconContainer}
-        >
-          <MaterialCommunityIcons name="content-copy" size={24} color={resultText !== '' ? colors.copyColor : colors.textColorcopyColor} />
+          onPress={copyToClipboard}
+          disabled={resultText === ""}
+          style={styles.iconContainer}>
+          <MaterialCommunityIcons name="content-copy" size={24} color={resultText !== '' ? 'black' : 'gray'} />
         </TouchableOpacity>
       </View>
 
