@@ -28,7 +28,7 @@ const translate = async (enteredText, languageFrom, languageTo) => {
       throw new Error('Translate call failed. Response status: ' + response.status);
     }
 
-    return response;
+    return response.data;
   } catch (error) {
     console.log(error);
     throw new Error('Translate call failed: ' + error.message);

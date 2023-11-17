@@ -9,10 +9,16 @@ const historySlice = createSlice({
         addHistoryItem: (state, action) => {
             const {item} = action.payload;
 
-            if(item) {
+            if (item) {
                 state.items.push(item);
             }
         },
+        setHistoryItems: (state, action) => {
+            state.items = action.payload.items;
+        },
+        clearHistory: (state) => {
+            state.items = []
+        }
     }
 });
 

@@ -34,8 +34,6 @@ export default function HomeScreen(props) {
     }
   }, [params.languageTo, params.languageFrom]);
 
-
-
   const onSubmit = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -45,7 +43,7 @@ export default function HomeScreen(props) {
         setResultText("");
         return;
       }
-      setResultText(result.data.trans_result[0].dst);
+      setResultText(result.trans_result[0].dst);
 
       const id = uuid.v4();
       result.id = id;

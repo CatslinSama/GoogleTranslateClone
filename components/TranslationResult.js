@@ -14,10 +14,10 @@ export default TranslationResult = props => {
         <View style={styles.textContainer}>
             <Text 
             numberOfLines={4}
-            style={styles.title}>{item.data.trans_result[0].src}</Text>
+            style={styles.title}>{item.trans_result[0].src}</Text>
             <Text 
             numberOfLines={4}
-            style={styles.subTitle}>{item.data.trans_result[0].dst}</Text>
+            style={styles.subTitle}>{item.trans_result[0].dst}</Text>
         </View>
 
         <TouchableOpacity>
