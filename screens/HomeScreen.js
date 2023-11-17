@@ -128,7 +128,7 @@ export default function HomeScreen(props) {
         style={styles.historyContainer}
       >
         <FlatList 
-          data={history}
+          data={history.slice().reverse()}
           renderItem={itemData => {
             return <TranslationResult itemId={itemData.item.id}/>
           }}
