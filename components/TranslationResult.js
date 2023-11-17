@@ -2,18 +2,22 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import colors from "../utils/colors";
 import { Feather } from '@expo/vector-icons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useSelector } from "react-redux";
 
 export default TranslationResult = props => {
+    const {itemId} = props;
+    const item = useSelector(state => state.history.items.find(item => item.id === itemId)); 
+
     return <View
         style={styles.container}
         onPress={props.onPress}>
         <View style={styles.textContainer}>
             <Text 
             numberOfLines={4}
-            style={styles.title}>Some item</Text>
+            style={styles.title}>{item.data.trans_result[0].src}</Text>
             <Text 
             numberOfLines={4}
-            style={styles.subTitle}>Some sub title</Text>
+            style={styles.subTitle}>{item.data.trans_result[0].dst}</Text>
         </View>
 
         <TouchableOpacity>

@@ -9,7 +9,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useDispatch, useSelector } from 'react-redux';
 import { addHistoryItem, setHistoryItems } from '../store/historySlice';
 import TranslationResult from '../components/TranslationResult';
-
+import uuid from 'react-native-uuid'
 
 export default function HomeScreen(props) {
   const params = props.route.params || {};
@@ -45,10 +45,13 @@ export default function HomeScreen(props) {
         setResultText("");
         return;
       }
-      setResultText(result);
+      setResultText(result.data.trans_result[0].dst);
 
+      const id = uuid.v4();
+      result.id = id;
+      result.dataTime = new Date().toString();
       // dispatch
-      dispatch(addHistoryItem({ item: result }));
+      dispatch(addHistoryItem({ item: result}));
     } catch (error) {
       console.log("bug in onSubmit :", error);
     }
@@ -129,7 +132,7 @@ export default function HomeScreen(props) {
         <FlatList 
           data={history}
           renderItem={itemData => {
-            return <TranslationResult/>
+            return <TranslationResult itemId={itemData.item.id}/>
           }}
         />
       </View>
