@@ -10,6 +10,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addHistoryItem, setHistoryItems } from '../store/historySlice';
 import TranslationResult from '../components/TranslationResult';
 import uuid from 'react-native-uuid'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const loadData = () => {
+  return async dispatch => {
+    try {
+      const historyString = await AsyncStorage.getItem('history');
+      if (historyString !== null) {
+        const history = JSON.parse(historyString);
+        dispatch(setHistoryItems({ items: history }));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
 
 export default function HomeScreen(props) {
   const params = props.route.params || {};
@@ -20,7 +36,7 @@ export default function HomeScreen(props) {
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
-  const history = useSelector(state =>  state.history.items);
+  const history = useSelector(state => state.history.items);
 
 
 
@@ -33,6 +49,21 @@ export default function HomeScreen(props) {
       setLanguageFrom(params.languageFrom);
     }
   }, [params.languageTo, params.languageFrom]);
+
+  useEffect(() => {
+    dispatch(loadData())
+  }, [dispatch])
+
+  useEffect(() => {
+    const saveHistory = async () => {
+      try {
+        await AsyncStorage.setItem('history', JSON.stringify(history));
+      } catch (error) {
+        console.log("saveHistory is ::", error);
+      }
+    }
+    saveHistory();
+  }, [history])
 
   const onSubmit = useCallback(async () => {
     try {
@@ -49,7 +80,7 @@ export default function HomeScreen(props) {
       result.id = id;
       result.dataTime = new Date().toString();
       // dispatch
-      dispatch(addHistoryItem({ item: result}));
+      dispatch(addHistoryItem({ item: result }));
     } catch (error) {
       console.log("bug in onSubmit :", error);
     }
@@ -57,7 +88,7 @@ export default function HomeScreen(props) {
       setIsLoading(false);
     }
 
-  }, [enteredText, languageTo, languageFrom,dispatch]);
+  }, [enteredText, languageTo, languageFrom, dispatch]);
 
 
   const copyToClipboard = useCallback(async () => {
@@ -127,10 +158,10 @@ export default function HomeScreen(props) {
       <View
         style={styles.historyContainer}
       >
-        <FlatList 
+        <FlatList
           data={history.slice().reverse()}
           renderItem={itemData => {
-            return <TranslationResult itemId={itemData.item.id}/>
+            return <TranslationResult itemId={itemData.item.id} />
           }}
         />
       </View>

@@ -6,6 +6,13 @@ import { useSelector } from 'react-redux';
 export default function SaveScreen() {
   const savedItems = useSelector(state => state.savedItems.items)
 
+
+  if(savedItems.length === 0) {
+    return<View style={styles.noItemTextContiner}>
+      <Text style={styles.noItemText} >Nothing to show</Text>
+    </View>
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -24,4 +31,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.greyBackground,
     padding: 10,
   },
+  noItemTextContiner: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  noItemText: {
+    fontFamily: 'regular',
+    letterSpacing: 3
+  }
 });
