@@ -1,10 +1,10 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import colors from "../utils/colors";
-import { Feather } from '@expo/vector-icons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback } from "react";
 import { setSavedItems } from "../store/savedItemsSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default TranslationResult = props => {
     const dispath = useDispatch();
@@ -15,7 +15,7 @@ export default TranslationResult = props => {
     const startIconColor = isSvaed ? colors.primary : 'gray';
 
 
-    const startItem = useCallback(() => {
+    const startItem = useCallback(async() => {
         let newsavedItems;
         if (isSvaed) {
             newsavedItems = savedItems.filter(i => i.id !== itemId)
@@ -23,6 +23,8 @@ export default TranslationResult = props => {
             newsavedItems = savedItems.slice();
             newsavedItems.push(item)
         }
+
+        await AsyncStorage.setItem('savedItems',JSON.stringify(newsavedItems))
 
         dispath(setSavedItems({ items: newsavedItems }));
     }, [dispath,savedItems]);
